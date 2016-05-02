@@ -10,7 +10,7 @@ import createQueryFields from './createQueryFields.js'
  * @param {Schema} schema
  * @returns {GraphQLObjectType}
  */
-const createQueryType = schema =>
+const createQueryType = (schema,userSchema) =>
   new GraphQLObjectType({
     name: 'RootQuery',
     description: schema.description || 'The entry type for GraphQL queries.',
@@ -21,6 +21,7 @@ const createQueryType = schema =>
         .map(table => createQueryFields(table))
         .reduce(ary(assign, 2), {})
       ),
+      ...(userSchema)
     },
   })
 

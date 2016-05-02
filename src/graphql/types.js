@@ -42,7 +42,7 @@ const fromID = encodedString => {
 
 export const IDType =
   new GraphQLScalarType({
-    name: 'ID',
+    name: 'EntityID',
     description:
       'A globally unique identifier used to refetch an object or as a key for a ' +
       'cache. It is not intended to be human readable.',

@@ -10,6 +10,8 @@ import { Command } from 'commander'
 import { parse as parseConnectionString } from 'pg-connection-string'
 import createGraphqlSchema from './createGraphqlSchema.js'
 import createServer from './createServer.js'
+import {extendSchema, parse, printSchema, graphql, execute, GraphQLSchema, GraphQLString, GraphQLObjectType} from 'graphql'
+import pg from 'pg'
 
 const manifest = JSON.parse(readFileSync(path.resolve(__dirname, '../package.json')))
 
@@ -49,8 +51,27 @@ const main = async () => {
     poolSize: maxPoolSize,
   }
 
+const newQueryType = new GraphQLObjectType({
+    name: 'RootQueryType',
+    fields: {
+      hello: {
+        type: GraphQLString,
+        resolve(obj) {
+          console.log('in resolve', obj);
+          return 'world';
+        }
+      }
+    }
+  })
+
   // Create the GraphQL schema.
-  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName)
+  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName,
+    {query: { someDumbQuery: {type: newQueryType, args: {id: {type: GraphQLString}}, resolve() {return '123'}}}} );
+
+  const client = await pg.connectAsync(pgConfig)
+  const result = await execute(graphqlSchema  , parse(`query{ someDumbQuery{ hello } }`), null, {client});
+  console.log(result);
+  client.end();
 
   // Create the GraphQL HTTP server.
   const server = await createServer({

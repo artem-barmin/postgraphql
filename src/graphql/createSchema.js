@@ -8,9 +8,9 @@ import createMutationType from './mutation/createMutationType.js'
  * @param {Schema} schema
  * @returns {GrpahQLSchema}
  */
-const createGraphqlSchema = schema =>
+const createGraphqlSchema = (schema,{query, mutation}) =>
   new GraphQLSchema({
-    query: createQueryType(schema),
+    query: createQueryType(schema, query),
     mutation: createMutationType(schema),
   })
 
