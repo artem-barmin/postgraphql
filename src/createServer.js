@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken'
 import pg from 'pg'
 import { GraphQLSchema, formatError } from 'graphql'
 import graphqlHTTP from 'express-graphql'
+import cors from 'cors'
 
 /**
  * Creates an HTTP server with the provided configuration.
@@ -21,14 +22,7 @@ import graphqlHTTP from 'express-graphql'
  * @param {boolean} config.development
  * @returns {Server}
  */
-const createServer = ({
-  graphqlSchema,
-  pgConfig,
-  route = '/',
-  secret,
-  development = true,
-  log = true,
-}) => {
+const createServer = ({graphqlSchema, pgConfig, route = '/', secret, development = true, log = true, }) => {
   assert(graphqlSchema instanceof GraphQLSchema, 'Must be an instance of GraphQL schema must be defined')
   assert(pgConfig, 'A PostgreSQL config must be defined')
 
@@ -36,6 +30,10 @@ const createServer = ({
 
   if (log) server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
+  server.use(cors({
+    origin: ['http://localhost:3000', 'http://192.168.1.201:3000'],
+    credentials: true
+  }))
 
   server.all(route, graphqlHTTP(async req => {
     // Acquire a new client for every request.
@@ -55,16 +53,18 @@ const createServer = ({
       // the pool, but also report that it failed. We cannot report an error in
       // the request at this point because it has finished.
       client.queryAsync('commit')
-      .then(() => client.end())
-      .catch(error => {
-        console.error(error.stack) // eslint-disable-line no-console
-        client.end()
-      })
+        .then(() => client.end())
+        .catch(error => {
+          console.error(error.stack) // eslint-disable-line no-console
+          client.end()
+        })
     })
 
     return {
       schema: graphqlSchema,
-      context: { client },
+      context: {
+        client
+      },
       pretty: development,
       graphiql: development,
       formatError: development ? developmentFormatError : formatError,
@@ -82,8 +82,10 @@ const setupRequestTransaction = async (req, client, secret) => {
   const token = getToken(req)
   if (!token) return
 
-  const decoded = await jwt.verifyAsync(token, secret, { audience: 'postgraphql' })
-  const { role } = decoded
+  const decoded = await jwt.verifyAsync(token, secret, {
+    audience: 'postgraphql'
+  })
+  const {role} = decoded
   const values = []
   const querySelection = []
 
@@ -121,7 +123,7 @@ const setupRequestTransaction = async (req, client, secret) => {
 const bearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
 
 const getToken = req => {
-  const { authorization } = req.headers
+  const {authorization} = req.headers
   const match = bearerRex.exec(authorization)
   if (!match) return null
   return match[1]

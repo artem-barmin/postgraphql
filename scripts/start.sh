@@ -1,4 +1,4 @@
 #!/bin/bash
 
 babel-watch --watch src \
-  src/main.js -- postgres://postgres:postgres@localhost:32769/postgres --schema forum_example --development 
+  src/main.js -- postgres://postgres:postgres@localhost:5432/political --development -p 5000 -n 0.0.0.0
