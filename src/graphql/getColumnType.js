@@ -1,23 +1,9 @@
 import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
 
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLEnumType,
+import { GraphQLBoolean, GraphQLInt, GraphQLFloat, GraphQLString, GraphQLList, GraphQLNonNull, GraphQLEnumType,
 } from 'graphql'
 
-import {
-  DateType,
-  BigIntType,
-  PointType,
-  CircleType,
-  IntervalType,
-  JSONType,
-  UUIDType,
+import { DateType, BigIntType, PointType, CircleType, IntervalType, JSONType, UUIDType,
 } from './types.js'
 
 const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
@@ -105,10 +91,14 @@ const getColumnEnumType = memoize(enum_ => {
     description: enum_.description,
     values: fromPairs(
       enum_.variants
-      .map(variant => [toUpper(snakeCase(variant)), { value: variant }])
+        .map(variant => [toUpper(snakeCase(variant)), {
+          value: variant
+        }])
     ),
   })
-}, enum_ => { return enum_.name })
+}, enum_ => {
+  return enum_.name
+})
 
 const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
@@ -119,10 +109,9 @@ const getColumnGraphqlType = memoize(column => {
     return wrapType(internalType)
 
   // If the column has an enum type, we need to create a `GraphQLEnumType`.
-  const enum_ = column.getEnum();
-  if (enum_) {
-    return wrapType(getColumnEnumType(enum_));
-  }
+  const enum_ = column.getEnum()
+  if (enum_)
+    return wrapType(getColumnEnumType(enum_))
 
   // Otherwise, just return `GraphQLString`.
   return wrapType(GraphQLString)

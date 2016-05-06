@@ -1,12 +1,4 @@
-import {
-  Kind,
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLNonNull,
-  GraphQLScalarType,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
+import { Kind, GraphQLBoolean, GraphQLInt, GraphQLFloat, GraphQLID, GraphQLNonNull, GraphQLScalarType, GraphQLObjectType, GraphQLInterfaceType,
 } from 'graphql'
 
 /* ============================================================================
@@ -16,93 +8,83 @@ import {
 const toBase64 = value => new Buffer(value.toString()).toString('base64')
 const fromBase64 = value => new Buffer(value.toString(), 'base64').toString()
 
-const createStringScalarType = ({ name, description }) =>
-  new GraphQLScalarType({
-    name,
-    description,
-    serialize: String,
-    parseValue: String,
-    parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
-  })
+const createStringScalarType = ({name, description}) => new GraphQLScalarType({
+  name,
+  description,
+  serialize: String,
+  parseValue: String,
+  parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
+})
 
 /* ============================================================================
  * Node Types
  * ========================================================================= */
 
-const toID = id => toBase64(`${id.tableName}:${id.values.join(',')}`)
+export const toID = (tableName, values) => toBase64(`${tableName}:${values.join(',')}`)
 
-const fromID = encodedString => {
+export const fromID = encodedString => {
   const string = fromBase64(encodedString)
-  if (!string) throw new Error(`Invalid ID '${encodedString}'.`)
+  if (!string)
+    throw new Error(`Invalid ID '${encodedString}'.`)
   const [tableName, valueString] = string.split(':', 2)
-  if (!valueString) throw new Error(`Invalid ID '${encodedString}'.`)
+  if (!valueString)
+    throw new Error(`Invalid ID '${encodedString}'.`)
   const values = valueString.split(',')
-  return { tableName, values }
+  return {
+    tableName,
+    values
+  }
 }
 
-export const IDType =
-  new GraphQLScalarType({
-    name: 'EntityID',
-    description:
-      'A globally unique identifier used to refetch an object or as a key for a ' +
-      'cache. It is not intended to be human readable.',
-    serialize: toID,
-    parseValue: fromID,
-    parseLiteral: ast => (ast.kind === Kind.STRING ? fromID(ast.value) : null),
-  })
-
-export const NodeType =
-  new GraphQLInterfaceType({
-    name: 'Node',
-    description: 'A single node object in the graph with a globally unique identifier.',
-    fields: {
-      id: {
-        type: IDType,
-        description: 'The `Node`’s globally unique identifier used to refetch the node.',
-      },
+export const NodeType = new GraphQLInterfaceType({
+  name: 'Node',
+  description: 'A single node object in the graph with a globally unique identifier.',
+  fields: {
+    id: {
+      type: GraphQLID,
+      description: 'The `Node`’s globally unique identifier used to refetch the node.',
     },
-  })
+  },
+})
 
 /* ============================================================================
  * Connection Types
  * ========================================================================= */
 
-export const CursorType =
-  new GraphQLScalarType({
-    name: 'Cursor',
-    description: 'An opaque base64 encoded string describing a location in a list of items.',
-    serialize: toBase64,
-    parseValue: fromBase64,
-    parseLiteral: ast => (ast.kind === Kind.STRING ? fromBase64(ast.value) : null),
-  })
+export const CursorType = new GraphQLScalarType({
+  name: 'Cursor',
+  description: 'An opaque base64 encoded string describing a location in a list of items.',
+  serialize: toBase64,
+  parseValue: fromBase64,
+  parseLiteral: ast => (ast.kind === Kind.STRING ? fromBase64(ast.value) : null),
+})
 
-export const PageInfoType =
-  new GraphQLObjectType({
-    name: 'PageInfo',
-    description: 'Information about pagination in a connection.',
-    fields: {
-      hasNextPage: {
-        type: new GraphQLNonNull(GraphQLBoolean),
-        description: 'Are there items after our result set to be queried?',
-        resolve: ({ hasNextPage }) => hasNextPage,
-      },
-      hasPreviousPage: {
-        type: new GraphQLNonNull(GraphQLBoolean),
-        description: 'Are there items before our result set to be queried?',
-        resolve: ({ hasPreviousPage }) => hasPreviousPage,
-      },
-      startCursor: {
-        type: CursorType,
-        description: 'The cursor for the first item in the list.',
-        resolve: ({ startCursor }) => startCursor,
-      },
-      endCursor: {
-        type: CursorType,
-        description: 'The cursor for the last item in the list.',
-        resolve: ({ endCursor }) => endCursor,
-      },
+export const PageInfoType = new GraphQLObjectType({
+  name: 'PageInfo',
+  description: 'Information about pagination in a connection.',
+  fields: {
+    hasNextPage: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Are there items after our result set to be queried?',
+      resolve: ({hasNextPage}) => hasNextPage,
     },
-  })
+    hasPreviousPage: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Are there items before our result set to be queried?',
+      resolve: ({hasPreviousPage}) => hasPreviousPage,
+    },
+    startCursor: {
+      type: CursorType,
+      description: 'The cursor for the first item in the list.',
+      resolve: ({startCursor}) => startCursor,
+    },
+    endCursor: {
+      type: CursorType,
+      description: 'The cursor for the last item in the list.',
+      resolve: ({endCursor}) => endCursor,
+    },
+  },
+})
 
 /* ============================================================================
  * PostgreSQL Types
@@ -156,13 +138,27 @@ export const IntervalType = new GraphQLObjectType({
   name: 'Interval',
   description: 'Some time span',
   fields: {
-    milliseconds: { type: GraphQLInt },
-    seconds: { type: GraphQLInt },
-    minutes: { type: GraphQLInt },
-    hours: { type: GraphQLInt },
-    days: { type: GraphQLInt },
-    months: { type: GraphQLInt },
-    years: { type: GraphQLInt },
+    milliseconds: {
+      type: GraphQLInt
+    },
+    seconds: {
+      type: GraphQLInt
+    },
+    minutes: {
+      type: GraphQLInt
+    },
+    hours: {
+      type: GraphQLInt
+    },
+    days: {
+      type: GraphQLInt
+    },
+    months: {
+      type: GraphQLInt
+    },
+    years: {
+      type: GraphQLInt
+    },
   },
 })
 
