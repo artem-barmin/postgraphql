@@ -31,7 +31,7 @@ const createServer = ({graphqlSchema, pgConfig, route = '/', secret, development
   if (log) server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
   server.use(cors({
-    origin: ['http://localhost:3000', 'http://192.168.1.201:3000'],
+    origin: ['http://localhost:3000', 'http://192.168.1.201:3000', 'http://pa6.com'],
     credentials: true
   }))
 

@@ -282,10 +282,6 @@ export class Column {
   }
 
   getFieldName () {
-    // There is a conflict with the `Node` interface. Therefore we need to alias `rowId`.
-    if (this.name === 'id')
-      return 'rowId'
-
     return camelCaseInsideUnderscores(this.name)
   }
 

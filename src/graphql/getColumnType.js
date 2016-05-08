@@ -1,7 +1,6 @@
 import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
 
-import { GraphQLBoolean, GraphQLInt, GraphQLFloat, GraphQLString, GraphQLList, GraphQLNonNull, GraphQLEnumType,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLInt, GraphQLFloat, GraphQLString, GraphQLList, GraphQLNonNull, GraphQLEnumType, GraphQLID } from 'graphql'
 
 import { DateType, BigIntType, PointType, CircleType, IntervalType, JSONType, UUIDType,
 } from './types.js'
@@ -103,6 +102,9 @@ const getColumnEnumType = memoize(enum_ => {
 const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
   const internalType = postgresToGraphQLTypes.get(column.type)
+
+  if (column.isPrimaryKey && internalType === UUIDType)
+    return wrapType(GraphQLID)
 
   // If our map has a `GraphQLType`, use it.
   if (internalType)
