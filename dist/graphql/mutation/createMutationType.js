@@ -1,0 +1,39 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _lodash = require('lodash');
+
+var _graphql = require('graphql');
+
+var _createInsertMutationField = require('./createInsertMutationField.js');
+
+var _createInsertMutationField2 = _interopRequireDefault(_createInsertMutationField);
+
+var _createUpdateMutationField = require('./createUpdateMutationField.js');
+
+var _createUpdateMutationField2 = _interopRequireDefault(_createUpdateMutationField);
+
+var _createDeleteMutationField = require('./createDeleteMutationField.js');
+
+var _createDeleteMutationField2 = _interopRequireDefault(_createDeleteMutationField);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+const createMutationType = schema => new _graphql.GraphQLObjectType({
+  name: 'RootMutation',
+  description: 'The entry type for GraphQL mutations.',
+  fields: schema.tables.map(table => createMutationFields(table)).reduce((0, _lodash.ary)(_lodash.assign, 2), {})
+});
+
+exports['default'] = createMutationType;
+
+
+const createMutationFields = table => ({
+  [`insert${ (0, _lodash.upperFirst)(table.getFieldName()) }`]: (0, _createInsertMutationField2['default'])(table),
+  [`update${ (0, _lodash.upperFirst)(table.getFieldName()) }`]: (0, _createUpdateMutationField2['default'])(table),
+  [`delete${ (0, _lodash.upperFirst)(table.getFieldName()) }`]: (0, _createDeleteMutationField2['default'])(table)
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9ncmFwaHFsL211dGF0aW9uL2NyZWF0ZU11dGF0aW9uVHlwZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7QUFBQTs7QUFDQTs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7OztBQUVBLE1BQU0scUJBQXFCLFVBQ3pCLCtCQUFzQjtBQUNwQixRQUFNLGNBRGM7QUFFcEIsZUFBYSx1Q0FGTztBQUdwQixVQUNFLE9BQU8sTUFBUCxDQUNDLEdBREQsQ0FDSyxTQUFTLHFCQUFxQixLQUFyQixDQURkLEVBRUMsTUFGRCxDQUVRLGlDQUFZLENBQVosQ0FGUixFQUV3QixFQUZ4QjtBQUprQixDQUF0QixDQURGOztxQkFVZSxrQjs7O0FBRWYsTUFBTSx1QkFBdUIsVUFBVTtBQUNyQyxHQUFDLENBQUMsTUFBRCxHQUFTLHdCQUFXLE1BQU0sWUFBTixFQUFYLENBQVQsRUFBMEMsQUFBMUMsQ0FBRCxHQUErQyw0Q0FBMEIsS0FBMUIsQ0FEVjtBQUVyQyxHQUFDLENBQUMsTUFBRCxHQUFTLHdCQUFXLE1BQU0sWUFBTixFQUFYLENBQVQsRUFBMEMsQUFBMUMsQ0FBRCxHQUErQyw0Q0FBMEIsS0FBMUIsQ0FGVjtBQUdyQyxHQUFDLENBQUMsTUFBRCxHQUFTLHdCQUFXLE1BQU0sWUFBTixFQUFYLENBQVQsRUFBMEMsQUFBMUMsQ0FBRCxHQUErQyw0Q0FBMEIsS0FBMUI7QUFIVixDQUFWLENBQTdCIiwiZmlsZSI6ImNyZWF0ZU11dGF0aW9uVHlwZS5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGFyeSwgYXNzaWduLCB1cHBlckZpcnN0IH0gZnJvbSAnbG9kYXNoJ1xuaW1wb3J0IHsgR3JhcGhRTE9iamVjdFR5cGUgfSBmcm9tICdncmFwaHFsJ1xuaW1wb3J0IGNyZWF0ZUluc2VydE11dGF0aW9uRmllbGQgZnJvbSAnLi9jcmVhdGVJbnNlcnRNdXRhdGlvbkZpZWxkLmpzJ1xuaW1wb3J0IGNyZWF0ZVVwZGF0ZU11dGF0aW9uRmllbGQgZnJvbSAnLi9jcmVhdGVVcGRhdGVNdXRhdGlvbkZpZWxkLmpzJ1xuaW1wb3J0IGNyZWF0ZURlbGV0ZU11dGF0aW9uRmllbGQgZnJvbSAnLi9jcmVhdGVEZWxldGVNdXRhdGlvbkZpZWxkLmpzJ1xuXG5jb25zdCBjcmVhdGVNdXRhdGlvblR5cGUgPSBzY2hlbWEgPT5cbiAgbmV3IEdyYXBoUUxPYmplY3RUeXBlKHtcbiAgICBuYW1lOiAnUm9vdE11dGF0aW9uJyxcbiAgICBkZXNjcmlwdGlvbjogJ1RoZSBlbnRyeSB0eXBlIGZvciBHcmFwaFFMIG11dGF0aW9ucy4nLFxuICAgIGZpZWxkczpcbiAgICAgIHNjaGVtYS50YWJsZXNcbiAgICAgIC5tYXAodGFibGUgPT4gY3JlYXRlTXV0YXRpb25GaWVsZHModGFibGUpKVxuICAgICAgLnJlZHVjZShhcnkoYXNzaWduLCAyKSwge30pLFxuICB9KVxuXG5leHBvcnQgZGVmYXVsdCBjcmVhdGVNdXRhdGlvblR5cGVcblxuY29uc3QgY3JlYXRlTXV0YXRpb25GaWVsZHMgPSB0YWJsZSA9PiAoe1xuICBbYGluc2VydCR7dXBwZXJGaXJzdCh0YWJsZS5nZXRGaWVsZE5hbWUoKSl9YF06IGNyZWF0ZUluc2VydE11dGF0aW9uRmllbGQodGFibGUpLFxuICBbYHVwZGF0ZSR7dXBwZXJGaXJzdCh0YWJsZS5nZXRGaWVsZE5hbWUoKSl9YF06IGNyZWF0ZVVwZGF0ZU11dGF0aW9uRmllbGQodGFibGUpLFxuICBbYGRlbGV0ZSR7dXBwZXJGaXJzdCh0YWJsZS5nZXRGaWVsZE5hbWUoKSl9YF06IGNyZWF0ZURlbGV0ZU11dGF0aW9uRmllbGQodGFibGUpLFxufSlcbiJdfQ==

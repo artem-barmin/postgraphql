@@ -1,0 +1,23 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.payloadClientMutationId = exports.inputClientMutationId = undefined;
+
+var _graphql = require('graphql');
+
+const inputClientMutationId = exports.inputClientMutationId = {
+  type: _graphql.GraphQLString,
+  description: 'An optional mutation ID for client’s to use in tracking mutations. ' + 'This field has no meaning to the server and is simply returned as ' + 'is.'
+};
+
+const payloadClientMutationId = exports.payloadClientMutationId = {
+  type: _graphql.GraphQLString,
+  description: 'If the mutation was passed a `clientMutationId` in the input object this ' + 'is the exact same value echoed back.',
+  resolve: _ref => {
+    let clientMutationId = _ref.clientMutationId;
+    return clientMutationId;
+  }
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9ncmFwaHFsL211dGF0aW9uL2NsaWVudE11dGF0aW9uSWQuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7OztBQUFBOztBQUVPLE1BQU0sd0RBQXdCO0FBQ25DLDhCQURtQztBQUVuQyxlQUNFLHdFQUNBLG9FQURBLEdBRUE7QUFMaUMsQ0FBOUI7O0FBUUEsTUFBTSw0REFBMEI7QUFDckMsOEJBRHFDO0FBRXJDLGVBQ0UsOEVBQ0Esc0NBSm1DO0FBS3JDLFdBQVM7QUFBQSxRQUFHLGdCQUFILFFBQUcsZ0JBQUg7QUFBQSxXQUEwQixnQkFBMUI7QUFBQTtBQUw0QixDQUFoQyIsImZpbGUiOiJjbGllbnRNdXRhdGlvbklkLmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgR3JhcGhRTFN0cmluZyB9IGZyb20gJ2dyYXBocWwnXG5cbmV4cG9ydCBjb25zdCBpbnB1dENsaWVudE11dGF0aW9uSWQgPSB7XG4gIHR5cGU6IEdyYXBoUUxTdHJpbmcsXG4gIGRlc2NyaXB0aW9uOlxuICAgICdBbiBvcHRpb25hbCBtdXRhdGlvbiBJRCBmb3IgY2xpZW504oCZcyB0byB1c2UgaW4gdHJhY2tpbmcgbXV0YXRpb25zLiAnICtcbiAgICAnVGhpcyBmaWVsZCBoYXMgbm8gbWVhbmluZyB0byB0aGUgc2VydmVyIGFuZCBpcyBzaW1wbHkgcmV0dXJuZWQgYXMgJyArXG4gICAgJ2lzLicsXG59XG5cbmV4cG9ydCBjb25zdCBwYXlsb2FkQ2xpZW50TXV0YXRpb25JZCA9IHtcbiAgdHlwZTogR3JhcGhRTFN0cmluZyxcbiAgZGVzY3JpcHRpb246XG4gICAgJ0lmIHRoZSBtdXRhdGlvbiB3YXMgcGFzc2VkIGEgYGNsaWVudE11dGF0aW9uSWRgIGluIHRoZSBpbnB1dCBvYmplY3QgdGhpcyAnICtcbiAgICAnaXMgdGhlIGV4YWN0IHNhbWUgdmFsdWUgZWNob2VkIGJhY2suJyxcbiAgcmVzb2x2ZTogKHsgY2xpZW50TXV0YXRpb25JZCB9KSA9PiBjbGllbnRNdXRhdGlvbklkLFxufVxuIl19
