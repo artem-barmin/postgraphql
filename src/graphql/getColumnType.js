@@ -103,7 +103,7 @@ const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
   const internalType = postgresToGraphQLTypes.get(column.type)
 
-  if (column.isPrimaryKey && internalType === UUIDType)
+  if (column.isPrimaryKey && internalType === GraphQLString)
     return wrapType(GraphQLID)
 
   // If our map has a `GraphQLType`, use it.
