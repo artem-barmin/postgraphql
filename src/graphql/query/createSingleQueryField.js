@@ -23,17 +23,14 @@ const createSingleQueryField = table => {
     args: {
       id: {
         type: new GraphQLNonNull(GraphQLID),
-        description: `The \`ID\` of the ${table.getMarkdownTypeName()} node.`,
       },
     },
 
     resolve: resolveTableSingle(
       table,
       primaryKeyColumns,
-      (source, { id }) => {
-        const { tableName, values } = fromID(id)
-        if (tableName !== table.name) return null
-        return values
+      (source, {id}) => {
+        return [id]
       }
     ),
   }
