@@ -10,7 +10,7 @@ import { Command } from 'commander'
 import { parse as parseConnectionString } from 'pg-connection-string'
 import createGraphqlSchema from './createGraphqlSchema.js'
 import createServer from './createServer.js'
-import {extendSchema, parse, printSchema, graphql, execute, GraphQLSchema, GraphQLString, GraphQLObjectType} from 'graphql'
+import { extendSchema, parse, printSchema, graphql, execute, GraphQLSchema, GraphQLString, GraphQLObjectType } from 'graphql'
 import pg from 'pg'
 
 const manifest = JSON.parse(readFileSync(path.resolve(__dirname, '../package.json')))
@@ -20,30 +20,22 @@ const main = async () => {
 
   /* eslint-disable max-len */
   program
-  .version(manifest.version)
-  .usage('[options] <url>')
-  .option('-s, --schema <identifier>', 'the PostgreSQL schema to serve a GraphQL server of. defaults to public')
-  .option('-n, --hostname <name>', 'a URL hostname the server will listen to. defaults to localhost')
-  .option('-p, --port <integer>', 'a URL port the server will listen to. defaults to 3000', parseInt)
-  .option('-d, --development', 'enables a development mode which enables GraphiQL, nicer errors, and JSON pretty printing')
-  .option('-r, --route <path>', 'the route to mount the GraphQL server on. defaults to /')
-  .option('-e, --secret <string>', 'the secret to be used to encrypt tokens. token authentication disabled if this is not set')
-  .option('-m, --max-pool-size <integer>', 'the maximum number of connections to keep in the connection pool. defaults to 10')
-  .parse(process.argv)
-  /* eslint-enable max-len */
+    .version(manifest.version)
+    .usage('[options] <url>')
+    .option('-s, --schema <identifier>', 'the PostgreSQL schema to serve a GraphQL server of. defaults to public')
+    .option('-n, --hostname <name>', 'a URL hostname the server will listen to. defaults to localhost')
+    .option('-p, --port <integer>', 'a URL port the server will listen to. defaults to 3000', parseInt)
+    .option('-d, --development', 'enables a development mode which enables GraphiQL, nicer errors, and JSON pretty printing')
+    .option('-r, --route <path>', 'the route to mount the GraphQL server on. defaults to /')
+    .option('-e, --secret <string>', 'the secret to be used to encrypt tokens. token authentication disabled if this is not set')
+    .option('-m, --max-pool-size <integer>', 'the maximum number of connections to keep in the connection pool. defaults to 10')
+    .parse(process.argv)
+    /* eslint-enable max-len */
 
-  const {
-    args: [connection],
-    schema: schemaName = 'public',
-    hostname = 'localhost',
-    port = 3000,
-    development = false,
-    route = '/',
-    secret,
-    maxPoolSize = 10,
-  } = program
+  const {args: [connection], schema: schemaName = 'public', hostname = 'localhost', port = 3000, development = false, route = '/', secret, maxPoolSize = 10, } = program
 
-  if (!connection) throw new Error('Must define a PostgreSQL connection string to connect to.')
+  if (!connection)
+    throw new Error('Must define a PostgreSQL connection string to connect to.')
 
   // Parse out the connection string into an object and attach a
   // `poolSize` option.
@@ -52,27 +44,8 @@ const main = async () => {
     poolSize: maxPoolSize,
   }
 
-const newQueryType = new GraphQLObjectType({
-    name: 'RootQueryType',
-    fields: {
-      hello: {
-        type: GraphQLString,
-        resolve(obj) {
-          console.log('in resolve', obj);
-          return 'world';
-        }
-      }
-    }
-  })
-
   // Create the GraphQL schema.
-  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName,
-    {query: { someDumbQuery: {type: newQueryType, args: {id: {type: GraphQLString}}, resolve() {return '123'}}}} );
-
-  const client = await pg.connectAsync(pgConfig)
-  const result = await execute(graphqlSchema  , parse(`query{ someDumbQuery{ hello } }`), null, {client});
-  console.log(result);
-  client.end();
+  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName);
 
   // Create the GraphQL HTTP server.
   const server = createServer({
