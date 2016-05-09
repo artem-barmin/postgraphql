@@ -32,7 +32,10 @@ const main = async () => {
     .parse(process.argv)
     /* eslint-enable max-len */
 
-  const {args: [connection], schema: schemaName = 'public', hostname = 'localhost', port = 3000, development = false, route = '/', secret, maxPoolSize = 10, } = program
+  var {args: [connection], schema: schemaName = 'public', hostname = 'localhost', port = 3000, development = false, route = '/', secret, maxPoolSize = 10, } = program
+
+  connection = process.env.DATABASE_URL || connection;
+  port = process.env.PORT || port;
 
   if (!connection)
     throw new Error('Must define a PostgreSQL connection string to connect to.')
