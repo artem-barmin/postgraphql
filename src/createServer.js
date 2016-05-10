@@ -11,6 +11,7 @@ import pg from 'pg'
 import { GraphQLSchema, formatError } from 'graphql'
 import graphqlHTTP from 'express-graphql'
 import cors from 'cors'
+import compress from 'compression'
 
 /**
  * Creates an HTTP server with the provided configuration.
@@ -29,6 +30,7 @@ const createServer = ({graphqlSchema, pgConfig, route = '/', secret, development
   const server = new Express()
 
   if (log) server.use(logger(development ? 'dev' : 'common'))
+  server.use(compress())
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
   server.use(Express.static(path.join(__dirname, '../public')))
   server.use(cors({
