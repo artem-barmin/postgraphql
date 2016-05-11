@@ -83,7 +83,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     nga.field('valueNumber'),
     nga.field('valueJson', 'embedded_list')
       .targetFields([
-        nga.field('a')
+        nga.field('value')
       ])
   ])
     .title('Edit config parameter "{{entry.values.key}}"');
