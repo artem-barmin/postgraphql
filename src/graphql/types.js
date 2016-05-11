@@ -162,8 +162,6 @@ export const IntervalType = new GraphQLObjectType({
   },
 })
 
-console.log('JSON fixes')
-
 export const JSONType = new GraphQLScalarType({
   name: 'JSON',
   description: 'An object not queryable by GraphQL(but supports serialization)',
