@@ -11,7 +11,8 @@ const requestFields = {
     name
   }
   `,
-  "user": `login password`
+  "user": `login password`,
+  "config": `key valueText valueNumber valueJson`
 }
 
 myApp.config(['NgAdminConfigurationProvider', function(nga) {
@@ -21,6 +22,8 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
   var topic = nga.entity('topic'); // the API endpoint for users will be 'http://jsonplaceholder.typicode.com/users/:id
   var argument = nga.entity('argument');
   var user = nga.entity('user');
+  var config = nga.entity('config');
+
   topic.listView()
     .fields([
       nga.field('name').isDetailLink(true)
@@ -44,18 +47,20 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
 
   argument.listView().fields([
     nga.field('content').isDetailLink(true),
-    nga.field('topicByTopic.name').isDetailLink(true)
+    nga.field('topicByTopic.name').label('Topic')
   ])
-  argument.creationView().fields([
-    nga.field('content'),
-    nga.field('topic', 'reference')
-      .label('Topic')
-      .targetEntity(topic)
-      .targetField(nga.field('name'))
-      .validation({
-        required: true
-      })
-  ])
+  argument.creationView()
+    .fields([
+      nga.field('content'),
+      nga.field('topic', 'reference')
+        .label('Topic')
+        .targetEntity(topic)
+        .targetField(nga.field('name'))
+        .validation({
+          required: true
+        })
+    ]);
+
   argument.editionView().fields(argument.creationView().fields());
 
   user.listView().fields([
@@ -67,14 +72,32 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
   ])
   user.editionView().fields(user.creationView().fields());
 
+  config.listView().fields([
+    nga.field('key').isDetailLink(true),
+    nga.field('value').template("{{entry.values.valueText || entry.values.valueNumber || entry.values.valueJson}}")
+  ]);
+
+  config.editionView().fields([
+    nga.field('key'),
+    nga.field('valueText'),
+    nga.field('valueNumber'),
+    nga.field('valueJson', 'embedded_list')
+      .targetFields([
+        nga.field('a')
+      ])
+  ])
+    .title('Edit config parameter "{{entry.values.key}}"');
+
   admin.addEntity(argument)
   admin.addEntity(topic)
   admin.addEntity(user)
+  admin.addEntity(config)
 
   admin.menu(nga.menu()
     .addChild(nga.menu(topic).icon('<span class="glyphicon glyphicon-list"></span>'))
     .addChild(nga.menu(argument).icon('<span class="glyphicon glyphicon-edit"></span>'))
     .addChild(nga.menu(user).icon('<span class="glyphicon glyphicon-user"></span>'))
+    .addChild(nga.menu(config).icon('<span class="glyphicon glyphicon-edit"></span>'))
   );
 
   nga.configure(admin);
@@ -112,12 +135,17 @@ function typeOfRequest(config) {
 
 function toMutationString(fields) {
   return _.compact(_.map(fields, function(value, key) {
-    if (value && !_.isObject(value))
-      return key + ":" + JSON.stringify(value);
+    if (value) {
+      var serialized = JSON.stringify(value)
+      if (_.isObject(value)) {
+        serialized = '"' + serialized.replace(/"/g, "\\\"") + '"'
+      }
+      return key + ":" + serialized
+    }
   })).join(",");
 }
 
-var graphQlHost = "https://political-clojure.herokuapp.com/graphql/";
+var graphQlHost = "http://localhost:5000/graphql";
 
 function RESTtoGraphQL(config) {
   let {method, params, url, data} = config;
@@ -161,7 +189,7 @@ function RESTtoGraphQL(config) {
     }
   } else if (type === "PUT") {
     const modifiedFields = _l.mapKeys(_.omit(data, ['id']), (v, key) => {
-      return 'new' + _l.capitalize(key);
+      return 'new' + _l.upperFirst(key);
     });
     const mutationInput = toMutationString(modifiedFields);
     return {
@@ -170,7 +198,7 @@ function RESTtoGraphQL(config) {
       url: graphQlHost,
       data: {
         query: `mutation{
-          update${_l.capitalize(entity)}(input:{id:"${id}",${mutationInput}}){
+          update${_l.upperFirst(entity)}(input:{id:"${id}",${mutationInput}}){
             ${entity}{
               id
             }
@@ -187,7 +215,7 @@ function RESTtoGraphQL(config) {
       url: graphQlHost,
       data: {
         query: `mutation{
-          insert${_l.capitalize(entity)}(input:{${mutationInput}}){
+          insert${_l.upperFirst(entity)}(input:{${mutationInput}}){
             ${entity}{
               id
             }
@@ -203,7 +231,7 @@ function RESTtoGraphQL(config) {
       url: graphQlHost,
       data: {
         query: `mutation{
-          delete${_l.capitalize(entity)}(input:{id:"${id}"}){
+          delete${_l.upperFirst(entity)}(input:{id:"${id}"}){
             ${entity}{
               id
             }
@@ -222,6 +250,8 @@ myApp.config(function($provide) {
       return $delegate(RESTtoGraphQL(config)).then((res) => {
         let {type, entity} = typeOfRequest(config);
         console.log('result', res);
+        if (res.data.errors)
+          throw new Error(res.data.errors[0].message);
         switch (type) {
           case "LIST":
             return Object.assign(res, {
@@ -233,7 +263,7 @@ myApp.config(function($provide) {
             });
           case "POST":
             return Object.assign(res, {
-              data: res.data.data["insert" + _l.capitalize(entity)][entity]
+              data: res.data.data["insert" + _l.upperFirst(entity)][entity]
             })
           default:
             return res;
