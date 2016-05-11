@@ -164,7 +164,7 @@ export const IntervalType = new GraphQLObjectType({
 
 export const JSONType = new GraphQLScalarType({
   name: 'JSON',
-  description: 'An object not queryable by GraphQL',
+  description: 'An object not queryable by GraphQL(but supports serialization)',
   serialize: (value) => value,
   parseValue: (value) => value,
   parseLiteral: (ast) => ast.value
