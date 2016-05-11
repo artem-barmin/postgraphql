@@ -145,7 +145,7 @@ function toMutationString(fields) {
   })).join(",");
 }
 
-var graphQlHost = "http://localhost:5000/graphql";
+var graphQlHost = "https://political-clojure.herokuapp.com/graphql/";
 
 function RESTtoGraphQL(config) {
   let {method, params, url, data} = config;
