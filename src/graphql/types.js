@@ -162,9 +162,12 @@ export const IntervalType = new GraphQLObjectType({
   },
 })
 
-export const JSONType = createStringScalarType({
+export const JSONType = new GraphQLScalarType({
   name: 'JSON',
   description: 'An object not queryable by GraphQL',
+  serialize: (value) => value,
+  parseValue: (value) => value,
+  parseLiteral: (ast) => ast.value
 })
 
 export const UUIDType = createStringScalarType({
