@@ -12,7 +12,7 @@ const requestFields = {
   }
   `,
   "user": `login password`,
-  "config": `key valueText valueNumber valueJson`
+  "config": `key description valueText valueNumber valueJson`
 }
 
 myApp.config(['NgAdminConfigurationProvider', function(nga) {
@@ -78,12 +78,18 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
   ]);
 
   config.editionView().fields([
-    nga.field('key'),
+    nga.field('key').editable(false),
+    nga.field('description', 'text').editable(false),
     nga.field('valueText'),
     nga.field('valueNumber'),
     nga.field('valueJson', 'embedded_list')
       .targetFields([
-        nga.field('value')
+        nga.field('name'),
+        nga.field('description', 'text'),
+        nga.field('examples', 'embedded_list').targetFields([
+          nga.field('actorOne.name'),
+          nga.field('actorOne.phrase', 'text')
+        ])
       ])
   ])
     .title('Edit config parameter "{{entry.values.key}}"');
